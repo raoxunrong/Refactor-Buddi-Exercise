@@ -1,14 +1,14 @@
 package org.homeunix.thecave.buddi.test.model;
 
-import static org.junit.Assert.assertEquals;
+import org.homeunix.thecave.buddi.model.impl.BudgetCategoryImpl;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.homeunix.thecave.buddi.model.impl.BudgetCategoryImpl;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class BetterBudgetCategoryTest {
 
@@ -57,5 +57,24 @@ public class BetterBudgetCategoryTest {
 		bc.setAmount(secondOfJuly2011, 31);
 		assertEquals(9100 + 2 + 22, bc.getAmount(tenthMarch2011, secondOfJuly2011));
 	}
-	
+
+    @Test
+    public void getAmountOfARangeWithSomeBudgetPeriodMissed() throws Exception {
+        bc.setAmount(tenthMarch2011, 31);
+        bc.setAmount(twentyMay2011, 3100);
+        bc.setAmount(twentyJune2011, 3000);
+        bc.setAmount(secondOfJuly2011, 31);
+        assertEquals(6100 + 2 + 22, bc.getAmount(tenthMarch2011, secondOfJuly2011));
+    }
+
+    @Test
+    public void getAmountOfARangeWithSomeBudgetPeriodSetAmountMoreThanOnce() throws Exception {
+        bc.setAmount(tenthMarch2011, 31);
+        bc.setAmount(twentyApril2011, 3000);
+        bc.setAmount(twentyMay2011, 3100);
+        bc.setAmount(twentyJune2011, 3000);
+        bc.setAmount(twentyJune2011, 6000);
+        bc.setAmount(secondOfJuly2011, 31);
+        assertEquals(12100 + 2 + 22, bc.getAmount(tenthMarch2011, secondOfJuly2011));
+    }
 }
