@@ -109,24 +109,19 @@ public class BudgetCategoryImpl extends SourceImpl implements BudgetCategory {
             return calculateAmount(startDate, endDate);
 		}
 		 
-		//If the area between Start and End overlap at least two budget periods. 
-        if (startBudgetPeriod.nextBudgetPeriod().equals(endBudgetPeriod) || startBudgetPeriod.nextBudgetPeriod().before(endBudgetPeriod)) {
-            double totalStartPeriod = calculateAmount(startDate, getBudgetPeriodType().getEndOfBudgetPeriod(startDate));
+        double totalStartPeriod = calculateAmount(startDate, getBudgetPeriodType().getEndOfBudgetPeriod(startDate));
 
-            double totalInMiddle = 0;
-            for (String periodKey : getBudgetPeriods(
-                    getBudgetPeriodType().getBudgetPeriodOffset(startDate, 1),
-                    getBudgetPeriodType().getBudgetPeriodOffset(endDate, -1))) {
-                totalInMiddle += getAmount(getPeriodDate(periodKey));
-                Logger.getLogger(this.getClass().getName()).info("Added " + getAmount(getPeriodDate(periodKey)) + " to total for one period in between; current value is " + totalInMiddle);
-            }
-
-            double totalEndPeriod = calculateAmount(getBudgetPeriodType().getStartOfBudgetPeriod(endDate), endDate);
-
-            return (long) (totalStartPeriod + totalInMiddle + totalEndPeriod);
+        double totalInMiddle = 0;
+        for (String periodKey : getBudgetPeriods(
+                getBudgetPeriodType().getBudgetPeriodOffset(startDate, 1),
+                getBudgetPeriodType().getBudgetPeriodOffset(endDate, -1))) {
+            totalInMiddle += getAmount(getPeriodDate(periodKey));
         }
 
-		throw new RuntimeException("You should not be here.  We have returned all legitimate numbers from getAmount(Date, Date) in BudgetCategoryImpl.  Please contact Wyatt Olson with details on how you got here (what steps did you perform in Buddi to get this error message).");
+        double totalEndPeriod = calculateAmount(getBudgetPeriodType().getStartOfBudgetPeriod(endDate), endDate);
+
+        return (long) (totalStartPeriod + totalInMiddle + totalEndPeriod);
+
 	}
 
     private BudgetPeriod getBudgetPeriod(Date startDate) {
