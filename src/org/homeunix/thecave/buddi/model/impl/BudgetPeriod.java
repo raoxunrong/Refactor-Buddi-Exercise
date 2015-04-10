@@ -10,11 +10,13 @@ import java.util.Date;
 public class BudgetPeriod {
     private final Date startDate;
     private BudgetCategoryType budgetCategoryType;
+    private Date endDate;
 
     public BudgetPeriod(Date date, BudgetCategoryType budgetCategoryType) {
         this.budgetCategoryType = budgetCategoryType;
 
         this.startDate = budgetCategoryType.getStartOfBudgetPeriod(date);
+        this.endDate = budgetCategoryType.getEndOfBudgetPeriod(date);
     }
 
     public Date getStartDate() {
@@ -32,5 +34,13 @@ public class BudgetPeriod {
 
     public boolean before(BudgetPeriod otherBudgetPeriod) {
         return this.startDate.before(otherBudgetPeriod.getStartDate());
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public BudgetPeriod prev() {
+        return new BudgetPeriod(budgetCategoryType.getBudgetPeriodOffset(startDate, -1), budgetCategoryType);
     }
 }

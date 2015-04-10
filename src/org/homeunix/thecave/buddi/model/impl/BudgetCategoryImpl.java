@@ -112,10 +112,8 @@ public class BudgetCategoryImpl extends SourceImpl implements BudgetCategory {
         double totalStartPeriod = calculateAmount(startDate, getBudgetPeriodType().getEndOfBudgetPeriod(startDate));
 
         double totalInMiddle = 0;
-        for (String periodKey : getBudgetPeriods(
-                getBudgetPeriodType().getBudgetPeriodOffset(startDate, 1),
-                getBudgetPeriodType().getBudgetPeriodOffset(endDate, -1))) {
-            totalInMiddle += getAmount(getPeriodDate(periodKey));
+        for (BudgetPeriod periodKey : getBudgetPeriods(startBudgetPeriod.nextBudgetPeriod(), endBudgetPeriod.prev())) {
+            totalInMiddle += getAmount(periodKey.getStartDate());
         }
 
         double totalEndPeriod = calculateAmount(getBudgetPeriodType().getStartOfBudgetPeriod(endDate), endDate);
@@ -138,21 +136,17 @@ public class BudgetCategoryImpl extends SourceImpl implements BudgetCategory {
     /**
 	 * Returns a list of BudgetPeriods, covering the entire range of periods
 	 * occupied by startDate to endDate.
-	 * @param startDate
-	 * @param endDate
-	 * @return
-	 */
-	public List<String> getBudgetPeriods(Date startDate, Date endDate){
-		List<String> budgetPeriodKeys = new LinkedList<String>();
+     * @param beginBudgetPeriod
+     * @param endBudgetPeriod @return
+     */
+	public List<BudgetPeriod> getBudgetPeriods(BudgetPeriod beginBudgetPeriod, BudgetPeriod endBudgetPeriod){
+        List<BudgetPeriod> budgetPeriods = new LinkedList<BudgetPeriod>();
 
-		Date temp = getBudgetPeriodType().getStartOfBudgetPeriod(startDate);
+        for(BudgetPeriod currentPeriod = beginBudgetPeriod;currentPeriod.before(endBudgetPeriod.nextBudgetPeriod()); currentPeriod = currentPeriod.nextBudgetPeriod()) {
+            budgetPeriods.add(currentPeriod);
+        }
 
-		while (temp.before(getBudgetPeriodType().getEndOfBudgetPeriod(endDate))){
-			budgetPeriodKeys.add(getPeriodKey(temp));
-			temp = getBudgetPeriodType().getBudgetPeriodOffset(temp, 1);
-		}
-
-		return budgetPeriodKeys;
+		return budgetPeriods;
 	}
 	
 	/**
