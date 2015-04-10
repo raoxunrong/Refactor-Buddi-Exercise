@@ -106,20 +106,12 @@ public class BudgetCategoryImpl extends SourceImpl implements BudgetCategory {
         BudgetPeriod endBudgetPeriod = getBudgetPeriod(endDate);
         Period period = new Period(startDate, endDate);
 
-        if (startBudgetPeriod.equals(endBudgetPeriod)){
-            return calculateAmount(startBudgetPeriod, period);
-		}
-		 
-        double totalStartPeriod = calculateAmount(startBudgetPeriod, period);
-
         double totalInMiddle = 0;
-        for (BudgetPeriod budgetPeriod : getBudgetPeriods(startBudgetPeriod.nextBudgetPeriod(), endBudgetPeriod.prev())) {
+        for (BudgetPeriod budgetPeriod : getBudgetPeriods(startBudgetPeriod, endBudgetPeriod)) {
             totalInMiddle += calculateAmount(budgetPeriod, period);
         }
 
-        double totalEndPeriod = calculateAmount(endBudgetPeriod, period);
-
-        return (long) (totalStartPeriod + totalInMiddle + totalEndPeriod);
+        return (long) (totalInMiddle);
 
 	}
 
