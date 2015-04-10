@@ -101,18 +101,16 @@ public class BudgetCategoryImpl extends SourceImpl implements BudgetCategory {
 			throw new RuntimeException("Start date cannot be before End Date!");
 		
 		Logger.getLogger(this.getClass().getName()).info("Starting to calculate the budgeted amount for " + getFullName() + " between " + startDate + " and " + endDate + ".");
-		
-		//If Start and End are in the same budget period
-		if (getBudgetPeriodType().getStartOfBudgetPeriod(startDate).equals(
-				getBudgetPeriodType().getStartOfBudgetPeriod(endDate))){
+
+        BudgetPeriod startBudgetPeriod = getBudgetPeriod(startDate);
+        BudgetPeriod endBudgetPeriod = getBudgetPeriod(endDate);
+
+        if (startBudgetPeriod.equals(endBudgetPeriod)){
             return calculateAmount(startDate, endDate);
 		}
 		 
 		//If the area between Start and End overlap at least two budget periods. 
-		if (getBudgetPeriodType().getBudgetPeriodOffset(startDate, 1).equals(
-				getBudgetPeriodType().getStartOfBudgetPeriod(endDate))
-				|| getBudgetPeriodType().getBudgetPeriodOffset(startDate, 1).before(
-						getBudgetPeriodType().getStartOfBudgetPeriod(endDate))) {
+        if (startBudgetPeriod.nextBudgetPeriod().equals(endBudgetPeriod) || startBudgetPeriod.nextBudgetPeriod().before(endBudgetPeriod)) {
             double totalStartPeriod = calculateAmount(startDate, getBudgetPeriodType().getEndOfBudgetPeriod(startDate));
 
             double totalInMiddle = 0;
@@ -130,6 +128,10 @@ public class BudgetCategoryImpl extends SourceImpl implements BudgetCategory {
 
 		throw new RuntimeException("You should not be here.  We have returned all legitimate numbers from getAmount(Date, Date) in BudgetCategoryImpl.  Please contact Wyatt Olson with details on how you got here (what steps did you perform in Buddi to get this error message).");
 	}
+
+    private BudgetPeriod getBudgetPeriod(Date startDate) {
+        return new BudgetPeriod(startDate, getBudgetPeriodType());
+    }
 
     private long calculateAmount(Date startDate, Date endDate) {
         long amount = getAmount(startDate);
