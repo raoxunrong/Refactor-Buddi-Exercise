@@ -1,5 +1,6 @@
 package org.homeunix.thecave.buddi.model.impl;
 
+import ca.digitalcave.moss.common.DateUtil;
 import org.homeunix.thecave.buddi.model.BudgetCategoryType;
 
 import java.util.Date;
@@ -42,5 +43,15 @@ public class BudgetPeriod {
 
     public BudgetPeriod prev() {
         return new BudgetPeriod(budgetCategoryType.getBudgetPeriodOffset(startDate, -1), budgetCategoryType);
+    }
+
+    public long getDaysInPeriod() {
+        return budgetCategoryType.getDaysInPeriod(startDate);
+    }
+
+    public long daysOverlap(Period period) {
+        Date startDate = period.getStartDate().after(getStartDate()) ? period.getStartDate() : getStartDate();
+        Date endDate = period.getEndDate().before(getEndDate()) ? period.getEndDate() : getEndDate();
+        return (long) DateUtil.getDaysBetween(startDate, endDate, true);
     }
 }
